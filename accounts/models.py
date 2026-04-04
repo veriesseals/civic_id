@@ -2,11 +2,12 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 
 # Create your models here.
+# Build the Custom User Model
 # ----------------------------------------------
 
 
 class User(AbstractUser):
-    id_mfa_enabled = models.BooleanField(default=False)
+    is_mfa_enabled = models.BooleanField(default=False)
     department = models.CharField(max_length = 100, blank = True, null = True)
     created_at = models.DateTimeField(auto_now_add = True)
     
