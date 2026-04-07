@@ -53,6 +53,7 @@ class NaturalizationRecord(models.Model):
     # Timestamp for when the naturalization record was created
     # ------------------------------------------
     created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
     
     # Timestamp for when the naturalization record was last updated
     # ------------------------------------------
