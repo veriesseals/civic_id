@@ -19,7 +19,7 @@ class ImmigrationStatus(models.Model):
     status_start_date = models.DateField()
     status_end_date = models.DateField(blank=True, null=True)
     issuing_authority = models.CharField(max_length=255)
-    reference_number = models.CharField(max_length=20, default="PENDING")
+    reference_number = models.CharField(max_length=100, default="PENDING", unique=True)
 
 
     created_at = models.DateTimeField(auto_now_add=True)
