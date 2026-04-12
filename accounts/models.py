@@ -38,4 +38,4 @@ class User(AbstractUser):
     # define the string representation of the model for better readability in the admin interface and other contexts 
     # ----------------------------------------------
     def __str__(self):
-        return f"{self.username} ({self.get_role})"
+        return f"{self.username} ({self.role})"

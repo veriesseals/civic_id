@@ -74,5 +74,9 @@ urlpatterns = [
     # ---------------------------------------------------------------
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    
+    # Including the URLs for the law enforcement application to allow access to the law enforcement API endpoints under the /api/law-enforcement/ path. This provides a dedicated namespace for our law enforcement-related API endpoints, making it easier to manage and organize our URL patterns.
+    # ---------------------------------------------------------------
+    path("api/law-enforcement/", include("law_enforcement.urls")),
 
 ]
