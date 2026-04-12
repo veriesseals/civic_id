@@ -54,7 +54,6 @@ router.register(r'birth-records', BirthRecordViewSet)
 router.register(r'audit-logs', AuditLogViewSet)
 router.register(r'id-applications', IDApplicationViewSet)
 router.register(r'issued-ids', IssuedIDViewSet)
-router.register(r'naturalization-records', NaturalizationRecordViewSet)
 router.register(r'immigration-status', ImmigrationStatusViewSet)
 router.register(r'naturalization', NaturalizationRecordViewSet)
 
