@@ -57,5 +57,7 @@ class VerificationRequest(models.Model):
     
     requested_at = models.DateTimeField(auto_now_add=True)
     
+    # define the string representation of the model for better readability in the admin interface and other contexts 
+    # ----------------------------------------------
     def __str__(self):
-        return f"{self.requested_by} looked up {self.person} - {self.requested_by}"
+        return f"{self.requested_by} looked up {self.person} - {self.requested_at}"
