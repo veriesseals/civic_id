@@ -35,6 +35,7 @@ INSTALLED_APPS = [
     "apps.audit",
     "apps.law_enforcement",
     "apps.voter_registration",
+    "apps.passports", 
 ]
 
 MIDDLEWARE = [

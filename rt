@@ -1,0 +1,78 @@
+from datetime import date
+
+
+class PassportSerializer(serializers.Modclass PassportSerializer(serializers.Modclass PassportSerializer(serializers.Modclass PassportSerializer(serializers.Modclass PassportSerializer(serializers.Modclass PassportSerializer(serialiall__"
+class PassportSerializer(serializers.Modclass PassportSerializer(serializers.Modclelf, obj):
+        return f"{obj.person.first_name} {obj.person.last_name or ''}".strip()
+
+    def get_days_remaining(self, obj):
+        if not         if not         if not         if not         if not         if not         if not         ay        if not         if not         if not         if not         if not         if not         ifk.p        if not         if not         if not          Pas        if not         if not         if not         if not         if not         if not         if not         ay        if not         if not     lated("p        if not         if not         if not         if not         if not         if not         if not       d]
+EOF
+
+cat > apps/passports/admin.py << 'EOF'
+from django.contrib import admin
+from .models import Passport
+
+
+@admin.register(Passport)
+class PassportAdmin(admin.ModelAdmin):
+    list_display  = ["passport_number", "person", "passport_type", "status", "issue_date", "expiration_date"]
+    list_filter   = ["status", "passport_type"]
+    search_fields = ["passport_number", "person__first_name", "person__last_name"]
+EOF
+
+cat > apps/passports/migrations/0001_initial.py << 'EOF'
+import django.db.models.deletion
+from django.conf import settings
+from django.db import migrations, models
+
+
+class Migration(migrations.Migration):
+
+    initial = True
+
+    dependencies = [
+        ('persons', '0001_initial'),
+        migrations.swappable_dependency(settings.AUTH_USER_MODEL),
+    ]
+
+    operations = [
+        migrations.CreateModel(
+            name='Passport',
+            fields=[
+                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('passport_number', models.CharField(max_length=20, unique=True)),
+                ('passport_type', models.CharField(
+                    choices=[('REGULAR','Regular'),('OFFICIAL','Official'),('DIPLOMATIC','Diplomatic')],
+                    default='REGULAR', max_length=20
+                )),
+                ('issuing_authority', models.CharField(default='U.S. Department of State', max_length=255)),
+                ('issue_date', models.DateField()),
+                ('expiration_date', models.DateField()),
+                ('status', models.CharField(
+                    choices=[('ACTIVE','Active'),('EXPIRED','Expired'),('REVOKED','Revoked'),('SUSPENDED','Suspended'),('LOST','Lost/Stolen')],
+                    default='ACTIVE', max_length=20
+                )),
+                ('notes', models.TextField(blank=True, null=True)),
+                ('created_at', models.DateTimeField(auto_now_add=True)),
+                ('updated_at', models.DateTimeField(auto_now=True)),
+                ('issued_by', models.ForeignKey(
+                    blank=True, null=True,
+                    on_delete=django.db.models.deletion.SET_NULL,
+                    related_name='passports_issued',
+                    to=settings.AUTH_USER_MODEL
+                )),
+                ('person', models.OneToOneField(
+                    on_delete=django.db.models.deletion.CASCADE,
+                    related_name='passport',
+                    to='persons.person'
+                )),
+            ],
+        ),
+    ]
+EOF
+
+echo "✅ All passport files created"
+ls -la apps/passports/
+ls -la apps/passports/migrations/
+

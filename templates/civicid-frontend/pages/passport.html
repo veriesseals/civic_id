@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>CIVIC-ID — Passport Registry</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;600;700&family=Source+Sans+3:wght@300;400;600&family=Playfair+Display:wght@700&display=swap" rel="stylesheet"/>
+  <link href="/static/styles.css" rel="stylesheet"/>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar navbar-dark" id="mainNav">
+  <div class="container-fluid px-4">
+    <div class="d-flex align-items-center gap-3">
+      <img src="/media/civic_id_2026.png" alt="CIVIC-ID" height="36"/>
+      <span class="navbar-brand mb-0">CIVIC-ID</span>
+      <span class="badge bg-secondary ms-1" id="roleLabel"></span>
+    </div>
+    <div class="d-flex align-items-center gap-3">
+      <span class="text-light small" id="clockDisplay"></span>
+      <span class="text-light small" id="userDisplay"></span>
+      <button class="btn btn-outline-light btn-sm" id="logoutBtn">
+        <i class="bi bi-box-arrow-right"></i> Logout
+      </button>
+    </div>
+  </div>
+</nav>
+
+<!-- SIDEBAR + CONTENT -->
+<div class="d-flex" style="min-height: calc(100vh - 56px);">
+
+  <!-- Sidebar -->
+  <div class="sidebar p-3" id="sidebar" style="width:240px; min-width:240px;"></div>
+
+  <!-- Main content -->
+  <div class="flex-grow-1 p-4">
+
+    <!-- Page header -->
+    <div class="d-flex align-items-center justify-content-between mb-4">
+      <div>
+        <h2 class="section-title mb-0"><i class="bi bi-passport me-2"></i>Passport Registry</h2>
+        <p class="text-muted small mb-0">U.S. Department of State — Passport Services</p>
+      </div>
+      <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#issueModal">
+        <i class="bi bi-plus-circle me-1"></i> Issue Passport
+      </button>
+    </div>
+
+    <!-- Stat cards -->
+    <div class="row g-3 mb-4">
+      <div class="col-sm-6 col-lg-3">
+        <div class="card stat-card h-100">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-start">
+              <div>
+                <div class="stat-number text-success" id="statActive">—</div>
+                <div class="stat-label">Active</div>
+              </div>
+              <i class="bi bi-patch-check-fill text-success fs-3 opacity-75"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-sm-6 col-lg-3">
+        <div class="card stat-card h-100">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-start">
+              <div>
+                <div class="stat-number text-warning" id="statExpired">—</div>
+                <div class="stat-label">Expired</div>
+              </div>
+              <i class="bi bi-clock-history text-warning fs-3 opacity-75"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-sm-6 col-lg-3">
+        <div class="card stat-card h-100">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-start">
+              <div>
+                <div class="stat-number text-danger" id="statRevoked">—</div>
+                <div class="stat-label">Revoked / Suspended</div>
+              </div>
+              <i class="bi bi-slash-circle text-danger fs-3 opacity-75"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-sm-6 col-lg-3">
+        <div class="card stat-card h-100">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-start">
+              <div>
+                <div class="stat-number text-info" id="statTotal">—</div>
+                <div class="stat-label">Total Records</div>
+              </div>
+              <i class="bi bi-journals text-info fs-3 opacity-75"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filter pills -->
+    <div class="mb-3 d-flex gap-2 flex-wrap align-items-center">
+      <span class="text-muted small me-1">Filter:</span>
+      <button class="btn btn-sm btn-outline-secondary filter-pill active" data-filter="ALL">All</button>
+      <button class="btn btn-sm btn-outline-success filter-pill" data-filter="ACTIVE">Active</button>
+      <button class="btn btn-sm btn-outline-warning filter-pill" data-filter="EXPIRED">Expired</button>
+      <button class="btn btn-sm btn-outline-danger filter-pill" data-filter="REVOKED">Revoked</button>
+      <button class="btn btn-sm btn-outline-danger filter-pill" data-filter="SUSPENDED">Suspended</button>
+      <button class="btn btn-sm btn-outline-secondary filter-pill" data-filter="LOST">Lost/Stolen</button>
+      <input type="text" id="searchInput" class="form-control form-control-sm ms-auto" style="max-width:220px" placeholder="Search name or number…"/>
+    </div>
+
+    <!-- Table -->
+    <div class="card">
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table table-hover mb-0" id="passportTable">
+            <thead class="table-dark">
+              <tr>
+                <th>Passport #</th>
+                <th>Holder</th>
+                <th>Type</th>
+                <th>Issue Date</th>
+                <th>Expiration</th>
+                <th>Days Left</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="passportBody">
+              <tr><td colspan="8" class="text-center text-muted py-4">Loading…</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Issue Passport Modal -->
+<div class="modal fade" id="issueModal" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title"><i class="bi bi-passport me-2"></i>Issue New Passport</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div id="issueAlert" class="alert d-none"></div>
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label">Person ID <span class="text-danger">*</span></label>
+            <input type="number" class="form-control" id="inPersonId" placeholder="Person's database ID"/>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Passport Number <span class="text-danger">*</span></label>
+            <input type="text" class="form-control" id="inPassportNumber" placeholder="e.g. US1234567"/>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Passport Type</label>
+            <select class="form-select" id="inPassportType">
+              <option value="REGULAR">Regular</option>
+              <option value="OFFICIAL">Official</option>
+              <option value="DIPLOMATIC">Diplomatic</option>
+            </select>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Issuing Authority</label>
+            <input type="text" class="form-control" id="inIssuingAuthority" value="U.S. Department of State"/>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Issue Date <span class="text-danger">*</span></label>
+            <input type="date" class="form-control" id="inIssueDate"/>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Expiration Date <span class="text-danger">*</span></label>
+            <input type="date" class="form-control" id="inExpirationDate"/>
+          </div>
+          <div class="col-12">
+            <label class="form-label">Notes</label>
+            <textarea class="form-control" id="inNotes" rows="2" placeholder="Optional remarks…"></textarea>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-primary" id="submitIssueBtn">
+          <i class="bi bi-save me-1"></i> Issue Passport
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Update Status Modal -->
+<div class="modal fade" id="statusModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title"><i class="bi bi-pencil-square me-2"></i>Update Passport Status</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div id="statusAlert" class="alert d-none"></div>
+        <p class="text-muted small mb-3">Passport: <strong id="statusPassportNum"></strong></p>
+        <label class="form-label">New Status</label>
+        <select class="form-select" id="newStatus">
+          <option value="ACTIVE">Active</option>
+          <option value="EXPIRED">Expired</option>
+          <option value="REVOKED">Revoked</option>
+          <option value="SUSPENDED">Suspended</option>
+          <option value="LOST">Lost/Stolen</option>
+        </select>
+        <input type="hidden" id="statusPassportId"/>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-warning" id="submitStatusBtn">
+          <i class="bi bi-arrow-repeat me-1"></i> Update Status
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/static/civic.js"></script>
+<script>
+  const API = '/api/passports/';
+  let allPassports = [];
+  let activeFilter = 'ALL';
+
+  // ── Load passports ──────────────────────────────────────────
+  async function loadPassports() {
+    const token = localStorage.getItem('access_token');
+    try {
+      const res = await fetch(API, { headers: { Authorization: `Bearer ${token}` } });
+      if (!res.ok) throw new Error('Failed to load');
+      allPassports = await res.json();
+      renderStats(allPassports);
+      renderTable(allPassports);
+    } catch (e) {
+      document.getElementById('passportBody').innerHTML =
+        `<tr><td colspan="8" class="text-center text-danger py-4">Error loading passports</td></tr>`;
+    }
+  }
+
+  function renderStats(data) {
+    document.getElementById('statActive').textContent  = data.filter(p => p.status === 'ACTIVE').length;
+    document.getElementById('statExpired').textContent = data.filter(p => p.status === 'EXPIRED').length;
+    document.getElementById('statRevoked').textContent = data.filter(p => ['REVOKED','SUSPENDED'].includes(p.status)).length;
+    document.getElementById('statTotal').textContent   = data.length;
+  }
+
+  function statusBadge(s) {
+    const map = {
+      ACTIVE: 'success', EXPIRED: 'warning', REVOKED: 'danger',
+      SUSPENDED: 'danger', LOST: 'secondary'
+    };
+    return `<span class="badge bg-${map[s] || 'secondary'}">${s}</span>`;
+  }
+
+  function daysLeftBadge(days) {
+    if (days === null || days === undefined) return '—';
+    if (days < 0)   return `<span class="text-danger fw-semibold">Expired ${Math.abs(days)}d ago</span>`;
+    if (days < 90)  return `<span class="text-warning fw-semibold">${days}d</span>`;
+    return `<span class="text-success">${days}d</span>`;
+  }
+
+  function renderTable(data) {
+    const search = document.getElementById('searchInput').value.toLowerCase();
+    const filtered = data.filter(p => {
+      const matchFilter = activeFilter === 'ALL' || p.status === activeFilter;
+      const matchSearch = !search
+        || (p.person_name || '').toLowerCase().includes(search)
+        || (p.passport_number || '').toLowerCase().includes(search);
+      return matchFilter && matchSearch;
+    });
+
+    const tbody = document.getElementById('passportBody');
+    if (!filtered.length) {
+      tbody.innerHTML = `<tr><td colspan="8" class="text-center text-muted py-4">No passports found.</td></tr>`;
+      return;
+    }
+    tbody.innerHTML = filtered.map(p => `
+      <tr>
+        <td><code>${p.passport_number}</code></td>
+        <td>${p.person_name || '—'}</td>
+        <td>${p.passport_type}</td>
+        <td>${p.issue_date}</td>
+        <td>${p.expiration_date}</td>
+        <td>${daysLeftBadge(p.days_remaining)}</td>
+        <td>${statusBadge(p.status)}</td>
+        <td>
+          <button class="btn btn-sm btn-outline-warning" onclick="openStatusModal(${p.id}, '${p.passport_number}', '${p.status}')">
+            <i class="bi bi-pencil"></i>
+          </button>
+        </td>
+      </tr>`).join('');
+  }
+
+  // ── Filter pills ────────────────────────────────────────────
+  document.querySelectorAll('.filter-pill').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.filter-pill').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      activeFilter = btn.dataset.filter;
+      renderTable(allPassports);
+    });
+  });
+
+  document.getElementById('searchInput').addEventListener('input', () => renderTable(allPassports));
+
+  // ── Issue passport ──────────────────────────────────────────
+  document.getElementById('submitIssueBtn').addEventListener('click', async () => {
+    const token = localStorage.getItem('access_token');
+    const alert = document.getElementById('issueAlert');
+    const payload = {
+      person:            parseInt(document.getElementById('inPersonId').value),
+      passport_number:   document.getElementById('inPassportNumber').value.trim(),
+      passport_type:     document.getElementById('inPassportType').value,
+      issuing_authority: document.getElementById('inIssuingAuthority').value.trim(),
+      issue_date:        document.getElementById('inIssueDate').value,
+      expiration_date:   document.getElementById('inExpirationDate').value,
+      notes:             document.getElementById('inNotes').value.trim(),
+    };
+    try {
+      const res = await fetch(API, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(JSON.stringify(err));
+      }
+      alert.className = 'alert alert-success';
+      alert.textContent = 'Passport issued successfully.';
+      alert.classList.remove('d-none');
+      setTimeout(() => { bootstrap.Modal.getInstance(document.getElementById('issueModal')).hide(); loadPassports(); }, 1200);
+    } catch (e) {
+      alert.className = 'alert alert-danger';
+      alert.textContent = `Error: ${e.message}`;
+      alert.classList.remove('d-none');
+    }
+  });
+
+  // ── Update status ───────────────────────────────────────────
+  function openStatusModal(id, num, currentStatus) {
+    document.getElementById('statusPassportId').value  = id;
+    document.getElementById('statusPassportNum').textContent = num;
+    document.getElementById('newStatus').value = currentStatus;
+    new bootstrap.Modal(document.getElementById('statusModal')).show();
+  }
+
+  document.getElementById('submitStatusBtn').addEventListener('click', async () => {
+    const token = localStorage.getItem('access_token');
+    const id    = document.getElementById('statusPassportId').value;
+    const alert = document.getElementById('statusAlert');
+    try {
+      const res = await fetch(`${API}${id}/`, {
+        method: 'PATCH',
+        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: document.getElementById('newStatus').value })
+      });
+      if (!res.ok) throw new Error('Update failed');
+      alert.className = 'alert alert-success';
+      alert.textContent = 'Status updated.';
+      alert.classList.remove('d-none');
+      setTimeout(() => { bootstrap.Modal.getInstance(document.getElementById('statusModal')).hide(); loadPassports(); }, 1000);
+    } catch (e) {
+      alert.className = 'alert alert-danger';
+      alert.textContent = `Error: ${e.message}`;
+      alert.classList.remove('d-none');
+    }
+  });
+
+  // ── Default issue date to today ─────────────────────────────
+  document.getElementById('inIssueDate').value = new Date().toISOString().split('T')[0];
+
+  loadPassports();
+</script>
+</body>
+</html>

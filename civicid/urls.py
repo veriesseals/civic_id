@@ -18,6 +18,9 @@ from apps.immigration_status.views import ImmigrationStatusViewSet
 from apps.naturalization.views import NaturalizationRecordViewSet
 from apps.voter_registration.views import VoterRegistrationViewSet, VoterIDViewSet
 
+from apps.passports.views import PassportViewSet
+
+
 # ── API Router ───────────────────────────────────────────────────
 router = DefaultRouter()
 router.register(r'persons',             PersonViewSet)
@@ -29,6 +32,7 @@ router.register(r'immigration-status',  ImmigrationStatusViewSet)
 router.register(r'naturalization',      NaturalizationRecordViewSet)
 router.register(r'voter-registrations', VoterRegistrationViewSet)
 router.register(r'voter-ids',           VoterIDViewSet)
+router.register(r'passports', PassportViewSet, basename='passport')
 
 # ── URL Patterns ─────────────────────────────────────────────────
 urlpatterns = [
@@ -55,6 +59,7 @@ urlpatterns = [
     path('pages/issued-ids/',      TemplateView.as_view(template_name='pages/issued-ids.html'),             name='issued-ids'),
     path('pages/administration/',  TemplateView.as_view(template_name='pages/administration.html'),         name='administration'),
     path('pages/voter-registration/', TemplateView.as_view(template_name='pages/voter-registration.html'),  name='voter-registration'),
+    path('pages/passport/', TemplateView.as_view(template_name='pages/passport.html'), name='passport'),
 ]
 
 # Serve media in development
