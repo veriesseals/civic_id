@@ -43,10 +43,11 @@
 
     .watermark {
       position: fixed;
-      bottom: -80px;
-      right: -80px;
-      width: 500px;
-      height: 500px;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 600px;
+      height: 600px;
       opacity: 0.04;
       filter: brightness(0) invert(1);
       pointer-events: none;
@@ -367,7 +368,7 @@
 <body>
 
   <!-- Watermark logo — served by Django at /media/ -->
-  <img src="/media/civic_id_2026.png" class="watermark" alt="" aria-hidden="true" onerror="this.style.display='none'" />
+  <!-- <img src="/media/civic_id_2026.png" class="watermark" alt="" aria-hidden="true" onerror="this.style.display='none'" /> -->
 
   <div class="classification-bar">
     ★ &nbsp; UNITED STATES GOVERNMENT — AUTHORIZED ACCESS ONLY &nbsp; ★
