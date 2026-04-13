@@ -41,7 +41,7 @@ function updateClock() {
   const el = document.getElementById('live-clock');
   if (!el) return;
   const now = new Date();
-  el.textContent = now.toUTCString().split(' ').slice(4, 5)[0] + ' UTC';
+  el.textContent = now.toUTCString().split(' ').slice(4, 5)[0] + ' GMT';
 }
 
 // ── NAV MAPS ────────────────────────────────────────────────────
