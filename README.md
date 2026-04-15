@@ -6,31 +6,20 @@
 
 ## Overview
 
-CivicID is a Django and Django REST Framework backend that models a multi-agency identity and civic management platform.
+CivicID is a Django and Django REST Framework backend that models a multi-agency identity and civic management platform. It supports structured interaction across all major civic identity domains — from birth registration to death records, marriage certificates, Social Security, Selective Service, voter registration, and passport issuance.
 
-It supports structured interaction across domains such as:
-
-- Identity management
-- Birth registration
-- Naturalization and immigration tracking
-- ID applications and issued IDs
-- Voter registration and voter ID issuance
-- Passport issuance
-- Law-enforcement verification
-- Audit and compliance logging
-
-The platform is designed around strict role-based access control, JWT authentication, and privacy-aware data access.
+The platform enforces strict role-based access control, JWT authentication, privacy-aware data design, and a permanent, tamper-evident audit trail.
 
 ---
 
 ## Project Goals
 
-- Build a centralized identity system
-- Enforce role-based access control (RBAC)
+- Build a centralized national identity system
+- Enforce role-based access control (RBAC) across all agencies
 - Secure APIs with JWT authentication
-- Track sensitive actions through audit logs
-- Support civic workflows such as voter registration
-- Simulate real-world multi-domain backend architecture
+- Track every sensitive action through an immutable audit log
+- Support full civic lifecycle: birth → identity → civic participation → death
+- Simulate real-world multi-agency backend architecture
 
 ---
 
@@ -39,12 +28,14 @@ The platform is designed around strict role-based access control, JWT authentica
 | Role | Description |
 |------|-------------|
 | SUPER_ADMIN | Full system access for development and testing |
-| REGISTRAR | Manages birth records and naturalization-related workflows |
-| DMV | Handles ID applications and issued IDs |
-| LAW_ENFORCEMENT | Performs identity verification requests |
-| AUDITOR | Reviews audit logs and compliance records |
-| ELECTIONS | Manages voter registration workflows |
-| STATE_DEPT | Supports passport-related workflows |
+| REGISTRAR | Birth records, death records, marriage certificates, Social Security, Selective Service |
+| DMV | ID applications and issued IDs |
+| LAW_ENFORCEMENT | Identity verification lookups (reason required, privacy-first) |
+| AUDITOR | Read-only audit log access |
+| ELECTIONS | Voter registration, voter ID issuance, felony flag and rights restoration |
+| STATE_DEPT | Passport issuance and status management |
+| SSA | Social Security Number issuance and management |
+| IMMIGRATION | Immigration status tracking and naturalization records |
 
 ---
 
@@ -57,16 +48,16 @@ The platform is designed around strict role-based access control, JWT authentica
 - SQLite (development)
 - django-cors-headers
 - django-filter
-- Celery
-- Redis
-- Pillow
-- Gunicorn
+- Celery 5.5.3
+- Redis 6.4.0
+- Pillow 11.3.0
+- Gunicorn 23.0.0
 
 ---
 
 ## Authentication
 
-JWT is used for protected API access.
+JWT is used for all protected API access.
 
 ### Obtain token
 `POST /api/token/`
@@ -74,99 +65,177 @@ JWT is used for protected API access.
 ### Refresh token
 `POST /api/token/refresh/`
 
-Use the returned access token on protected routes:
-
-`Authorization: Bearer <access_token>`
+All protected routes require:
+```
+Authorization: Bearer <access_token>
+```
 
 ---
 
 ## Core API Domains
 
-- `/api/persons/`
-- `/api/birth-records/`
-- `/api/id-applications/`
-- `/api/issued-ids/`
-- `/api/immigration-status/`
-- `/api/naturalization/`
-- `/api/voter-registrations/`
-- `/api/voter-ids/`
-- `/api/passports/`
-- `/api/law-enforcement/`
-- `/api/audit-logs/`
+| Endpoint | Description |
+|----------|-------------|
+| `/api/persons/` | Identity registry — PATCH triggers audit-logged change record |
+| `/api/birth-records/` | Birth certificate registration |
+| `/api/death-records/` | Death certificates — cascades to voter, passport, selective service |
+| `/api/marriage-certificates/` | Civil union registry — name changes applied automatically |
+| `/api/social-security/` | SSN assignment — SSN write-only, masked on read |
+| `/api/selective-service/` | Federal Selective Service registration |
+| `/api/person-photos/` | Photo history per person |
+| `/api/id-applications/` | DMV ID applications |
+| `/api/issued-ids/` | Issued ID credentials |
+| `/api/immigration-status/` | Immigration status records |
+| `/api/naturalization/` | Naturalization records |
+| `/api/voter-registrations/` | Voter registration records |
+| `/api/voter-ids/` | Voter ID credentials |
+| `/api/passports/` | Passport issuance and management |
+| `/api/law-enforcement/verify/` | Privacy-first identity lookup (reason required) |
+| `/api/law-enforcement/history/` | Officer's own lookup history |
+| `/api/voter/eligibility/` | Eligibility check (citizenship, age, felony gates) |
+| `/api/voter/register/` | Register voter + issue voter ID |
+| `/api/voter/flag-felony/` | Flag felony conviction, suspend voter ID |
+| `/api/voter/restore/` | Restore voting rights, reactivate voter ID |
+| `/api/audit-logs/` | Read-only compliance audit trail |
+| `/api/token/` | Obtain JWT |
+| `/api/token/refresh/` | Refresh JWT |
 
 ---
 
 ## Key Features
 
-### Identity and Credentialing
-- Person records
-- Birth records
-- Naturalization records
-- Immigration status tracking
-- ID applications and issued IDs
-- Passport issuance
+### Identity & Credentialing
+- Person records with full demographic data, gender, address, and photo
+- Birth record registration (link to existing or create new person simultaneously)
+- Naturalization and immigration status tracking
+- ID applications and issued credentials
+- Passport issuance with days-remaining tracking
+
+### Vital Events
+- **Death Records** — filing automatically suspends voter registration, voter ID, passport, and selective service via Django signals
+- **Marriage Certificates** — name changes applied automatically to Person records; maiden name preserved; audit logged
+- **Person Edits** — every PATCH to a Person record diffs before/after state, requires a typed reason, and writes a permanent audit entry with officer identity and timestamp
+
+### Social Security
+- OneToOne SSN assignment per person
+- SSN stored as plain text in dev; write-only in API (only masked display `***-**-1234` returned)
+- Access restricted to SSA, REGISTRAR, and SUPER_ADMIN roles
+
+### Selective Service
+- Federal law compliance: all males 18–25 required to register (50 U.S.C. § 3802), regardless of citizenship
+- Auto-registration via Celery Beat task daily at midnight UTC when a qualifying person turns 18
+- Auto-deregistration at age 26 (daily task at 00:30 UTC)
+- Manual registration with gender/age validation warnings in UI
 
 ### Voter Registration
-- Identity-linked voter registration
-- Duplicate registration prevention
-- Eligibility checks
-- Felony ineligibility tracking
-- Rights restoration tracking
-- Voter ID issuance
+- Three-gate eligibility: citizenship, age 18+, no active felony
+- Automatic voter registration + voter ID issuance on eligibility confirmation
+- Felony flagging suspends voter ID immediately
+- Rights restoration reactivates registration and voter ID
 
 ### Law Enforcement Verification
-- Reason-based identity verification requests
-- Minimal-person-data response design
-- Officer-specific verification history
-- Automatic audit logging on lookups
+- Reason required before any data is returned
+- Only 5 minimum-necessary fields returned (name, DOB, citizenship)
+- Every lookup automatically logged to audit trail
+- Officers can only view their own history
 
-### Audit Logging
-- Tracks sensitive actions across the system
-- Supports accountability and traceability
-- Used in law-enforcement and voter workflows
+### Audit & Compliance
+- All sensitive actions across every module write to `AuditLog`
+- Person edits record: officer, timestamp, reason, and field-level diff (`{from, to}` per field)
+- Death record filings, marriage registrations, voter actions, LE lookups all auto-logged
+- Read-only via API; no delete endpoint
+
+### Automated Tasks (Celery + Redis)
+- **Midnight UTC**: `run_daily_civic_checks` — auto-registers voters and selective service for everyone turning 18 that day
+- **00:30 UTC**: `deregister_selective_service_age_26` — removes persons from selective service rolls at age 26
 
 ---
 
 ## Frontend Pages
 
-The project also includes a frontend template layer for:
+| Page | Roles | Description |
+|------|-------|-------------|
+| `/` | All | Agency selection + secure login |
+| `/pages/dashboard/` | All | System-wide stats and recent activity |
+| `/pages/persons/` | All (edit: REGISTRAR, DMV, SUPER_ADMIN) | Identity registry with edit modal + audit trail |
+| `/pages/birth-records/` | REGISTRAR, SUPER_ADMIN | New record modal: existing person or create new inline; gender field |
+| `/pages/death-records/` | REGISTRAR, LAW_ENFORCEMENT, SUPER_ADMIN | File death record; cascades fire automatically |
+| `/pages/marriage/` | REGISTRAR, SUPER_ADMIN | Register marriage; name changes auto-applied |
+| `/pages/social-security/` | SSA, REGISTRAR, SUPER_ADMIN | Issue SSN; masked display |
+| `/pages/selective-service/` | REGISTRAR, SUPER_ADMIN | Registry + manual registration with age/gender warnings |
+| `/pages/id-applications/` | DMV, SUPER_ADMIN | ID application management |
+| `/pages/issued-ids/` | DMV, SUPER_ADMIN | Credential status and expiration tracking |
+| `/pages/immigration/` | IMMIGRATION, SUPER_ADMIN | Immigration status + naturalization |
+| `/pages/voter-registration/` | ELECTIONS, SUPER_ADMIN | Eligibility check, registration, felony flag, rights restoration |
+| `/pages/passport/` | STATE_DEPT, SUPER_ADMIN | Passport issuance and status management |
+| `/pages/law-enforcement/` | LAW_ENFORCEMENT | Identity lookup portal |
+| `/pages/audit/` | AUDITOR, SUPER_ADMIN | Full audit log with action filtering |
+| `/pages/administration/` | SUPER_ADMIN | System overview, module links, API reference |
 
-- dashboard
-- persons
-- birth records
-- ID applications
-- issued IDs
-- immigration
-- law enforcement
-- administration
-- voter registration
-- passport pages
+---
+
+## Running the Project
+
+### 1. Start Django
+```bash
+python manage.py runserver
+```
+
+### 2. Start Redis (required for Celery)
+```bash
+brew install redis        # macOS — one time only
+brew services start redis
+redis-cli ping            # expect: PONG
+```
+
+### 3. Start Celery Worker
+```bash
+celery -A civicid worker --loglevel=info
+```
+
+### 4. Start Celery Beat (scheduled tasks)
+```bash
+celery -A civicid beat --loglevel=info
+```
+
+### Media directory setup (one time)
+```bash
+mkdir -p media/person_photos/history
+cp templates/civicid-frontend/media/civic_id_2026.png media/civic_id_2026.png
+```
+
+### Create superuser
+```bash
+python manage.py createsuperuser
+```
 
 ---
 
 ## Project Status
 
 ### Completed
-- Core identity models
-- JWT authentication
-- RBAC foundation
-- Law-enforcement verification MVP
-- Voter registration module
-- Passport module
-- Manual audit logging
-- Frontend page routing
-
-### In Progress
-- Automated audit logging
-- Permission hardening
-- Template and frontend completion
-- Data exposure controls
+- Core identity models with full migration history
+- JWT authentication + RBAC (9 roles)
+- Law enforcement verification (privacy-first, audit-logged)
+- Voter registration module (eligibility gates, felony tracking, rights restoration)
+- Passport module with days-remaining calculation
+- Birth records with inline person creation
+- Death records with automatic cascade signals
+- Marriage certificates with automatic name change signals
+- Social Security registry (SSN masked in API)
+- Selective Service registry (federal law compliance)
+- Person edit audit logging (field-level diff, officer, timestamp, reason)
+- Celery + Redis automated civic tasks (age 18 registration, age 26 deregistration)
+- Full frontend with 16 pages, role-gated navigation
+- SSA agency card on login page
 
 ### Planned
-- Full frontend dashboard polish
 - Docker deployment
 - Cloud hosting
 - Java / Spring Boot version
+- Full permission hardening (DRF permission classes per role per endpoint)
+- Person profile page with linked records view
+- Photo upload UI
 
 ---
 
@@ -174,19 +243,21 @@ The project also includes a frontend template layer for:
 
 CivicID demonstrates:
 
-- secure backend architecture
-- role-based system design
-- civic and identity workflow modeling
-- audit-focused engineering
-- multi-domain data design
-- real-world API and frontend integration
+- Secure, production-grade backend architecture
+- Multi-agency role-based system design
+- Full civic lifecycle modeling (birth → identity → participation → death)
+- Privacy-first API design (law enforcement minimal-data pattern)
+- Audit-focused engineering (immutable logs, field-level diffs, officer attribution)
+- Signal-driven cascade automation
+- Scheduled task automation with Celery and Redis
+- Real-world multi-domain data relationships
 
 ---
 
 ## Author
 
-**Veries Seals III**  
-B.S. Computer Science (Software Engineering)  
+**Veries Seals III**
+B.S. Computer Science (Software Engineering)
 Colorado Technical University
 
 ---
