@@ -14,7 +14,21 @@ const AGENCY_LABELS = {
 
 const API_BASE = 'http://127.0.0.1:8000/api';
 
-// ── AUTH / SESSION HELPERS ────────────────────────────────────────
+// ── CHANGE START: AUTH / SESSION / CSRF SUPPORT ───────────────────
+//
+// WHAT CHANGED:
+// 1. Added getCookie() to read Django's csrftoken cookie.
+// 2. Updated authHeaders() so it only sends Authorization if a JWT exists.
+// 3. Added X-CSRFToken automatically when available.
+// 4. Updated apiFetch() to send credentials: 'same-origin' so Django session
+//    auth works for logged-in browser users.
+// 5. Improved error parsing so API failures are easier to debug.
+//
+// WHY:
+// Your frontend was previously relying on localStorage JWT only.
+// That caused 401/403 problems when using Django-rendered pages while logged in
+// as a superuser through the browser session.
+// ── CHANGE END ─────────────────────────────────────────────────────
 
 function getToken() {
   return localStorage.getItem('civic_access');
@@ -90,7 +104,7 @@ async function apiFetch(path, options = {}) {
         errorMessage = JSON.stringify(errorData);
       }
     } catch (err) {
-      // Ignore JSON parse failure and keep fallback error message
+      // Keep fallback message if response is not JSON
     }
 
     throw new Error(errorMessage);
@@ -103,7 +117,7 @@ async function apiFetch(path, options = {}) {
   return response.json();
 }
 
-// ── CLOCK ─────────────────────────────────────────────────────────
+// ── CLOCK ──────────────────────────────────────────────────────────
 
 function updateClock() {
   const el = document.getElementById('live-clock');
@@ -113,7 +127,7 @@ function updateClock() {
   el.textContent = now.toUTCString().split(' ').slice(4, 5)[0] + ' GMT';
 }
 
-// ── NAV MAPS ──────────────────────────────────────────────────────
+// ── NAV MAPS ───────────────────────────────────────────────────────
 
 const NAV_LINKS = {
   SUPER_ADMIN: [
@@ -183,7 +197,7 @@ const NAV_LINKS = {
   ],
 };
 
-// ── HEADER INJECTION ──────────────────────────────────────────────
+// ── HEADER INJECTION ───────────────────────────────────────────────
 
 function injectHeader(activePage) {
   const agency = getAgency();
@@ -236,7 +250,7 @@ function injectHeader(activePage) {
   updateClock();
 }
 
-// ── DISPLAY HELPERS ───────────────────────────────────────────────
+// ── FORMAT HELPERS ────────────────────────────────────────────────
 
 function formatDate(dateStr) {
   if (!dateStr) return '—';
@@ -301,7 +315,7 @@ function statusBadge(status) {
   return `<span class="status-badge ${cls}">${(status || '').replace(/_/g, ' ')}</span>`;
 }
 
-// ── SHARED PERSON EDIT MODAL LOGIC ────────────────────────────────
+// ── SHARED PERSON EDIT MODAL ──────────────────────────────────────
 
 let _editPersonId = null;
 
