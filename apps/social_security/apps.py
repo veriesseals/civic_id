@@ -1,6 +1,6 @@
 from django.apps import AppConfig
 
 
-class CivicTasksConfig(AppConfig):
-    name = 'apps.civic_tasks'
+class SocialSecurityConfig(AppConfig):
+    name = 'apps.social_security'
     default_auto_field = 'django.db.models.BigAutoField'

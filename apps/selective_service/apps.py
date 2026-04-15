@@ -1,6 +1,6 @@
 from django.apps import AppConfig
 
 
-class CivicTasksConfig(AppConfig):
-    name = 'apps.civic_tasks'
+class SelectiveServiceConfig(AppConfig):
+    name = 'apps.selective_service'
     default_auto_field = 'django.db.models.BigAutoField'
