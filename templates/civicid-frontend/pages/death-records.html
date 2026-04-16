@@ -6,40 +6,34 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet" />
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Source+Sans+3:wght@300;400;500;600;700&family=Oswald:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <!-- All styles in styles.css — no inline <style> block -->
   <link href="/static/styles.css" rel="stylesheet" />
 </head>
 <body>
 <script src="/static/civic.js"></script>
 <script>injectHeader('death-records');</script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-
 <div class="page-container">
   <div class="page-hero hero-danger">
-    <div>
-      <h1><i class="bi bi-file-earmark-x me-2"></i>Death Records</h1>
-      <p>Official death certificate registry — cascades to voter, passport, and selective service records</p>
-    </div>
-    <div class="hero-meta"><div class="hero-restricted">⚠ REGISTRAR / LAW ENFORCEMENT</div></div>
+    <div><h1><i class="bi bi-file-earmark-x me-2"></i>Death Records</h1>
+      <p>Official death certificate registry — cascades to voter, passport, and selective service records</p></div>
+    <div class="hero-meta"><div class="hero-restricted">&#9888; REGISTRAR / LAW ENFORCEMENT</div></div>
   </div>
-
   <div class="alert-banner warning mb-4" style="font-size:12px;">
     <i class="bi bi-exclamation-triangle-fill"></i>
-    Filing a death record permanently marks the person as deceased and automatically suspends their
-    voter registration, passport, and selective service registration.
+    Filing a death record permanently marks the person as deceased and automatically suspends their voter registration, passport, and selective service registration.
   </div>
-
   <div class="row g-3 mb-4">
     <div class="col-md-3"><div class="stat-card red"><div class="stat-label">Total Records</div><div class="stat-value" id="stat-total">0</div></div></div>
     <div class="col-md-3"><div class="stat-card gold"><div class="stat-label">Natural Causes</div><div class="stat-value" id="stat-natural">0</div></div></div>
     <div class="col-md-3"><div class="stat-card red"><div class="stat-label">Homicide</div><div class="stat-value" id="stat-homicide">0</div></div></div>
     <div class="col-md-3"><div class="stat-card"><div class="stat-label">Pending</div><div class="stat-value" id="stat-pending">0</div></div></div>
   </div>
-
   <div class="data-table-wrapper">
     <div class="table-header">
       <h2><i class="bi bi-file-earmark-x me-2"></i>Death Certificate Registry</h2>
       <div class="table-actions">
-        <input type="text" id="search-input" placeholder="Search certificate #…" oninput="filterRecords()"
+        <input type="text" id="search-input" placeholder="Search certificate #&hellip;" oninput="filterRecords()"
           style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);color:white;padding:6px 12px;border-radius:3px;font-size:12px;" />
         <button class="btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#newDeathModal">
           <i class="bi bi-plus-circle me-1"></i>File Death Record
@@ -48,39 +42,29 @@
     </div>
     <table class="data-table">
       <thead>
-        <!-- Photo column added between Certificate # and Person -->
         <tr>
           <th>Certificate #</th>
           <th style="width:52px;">Photo</th>
-          <th>Person</th>
-          <th>Date of Death</th>
-          <th>Place</th>
-          <th>Cause Category</th>
-          <th>Filed By</th>
-          <th>Filed</th>
+          <th>Person</th><th>Date of Death</th><th>Place</th>
+          <th>Cause Category</th><th>Filed By</th><th>Filed</th>
         </tr>
       </thead>
-      <tbody id="records-tbody">
-        <tr><td colspan="8" style="text-align:center;padding:32px;color:#8896B0;">Loading...</td></tr>
-      </tbody>
+      <tbody id="records-tbody"><tr><td colspan="8" style="text-align:center;padding:32px;color:#8896B0;">Loading...</td></tr></tbody>
     </table>
   </div>
 </div>
 
-<!-- FILE DEATH RECORD MODAL -->
 <div class="modal fade" id="newDeathModal" tabindex="-1">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header" style="background:#7B0000;border-bottom:2px solid var(--gold);">
         <h5 class="modal-title" style="font-family:var(--font-display);letter-spacing:2px;color:white;font-size:14px;">
-          <i class="bi bi-file-earmark-x me-2"></i>FILE DEATH RECORD
-        </h5>
+          <i class="bi bi-file-earmark-x me-2"></i>FILE DEATH RECORD</h5>
         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
       </div>
       <div class="modal-body" style="padding:24px;">
         <div class="alert-banner danger mb-3" style="font-size:12px;">
-          <i class="bi bi-exclamation-octagon"></i>
-          This action is irreversible. The person will be marked deceased and linked records will be suspended automatically.
+          <i class="bi bi-exclamation-octagon"></i>This action is irreversible. The person will be marked deceased and linked records will be suspended automatically.
         </div>
         <div class="row g-3">
           <div class="col-md-4">
@@ -94,19 +78,14 @@
           <div class="col-md-4"><label class="form-label">Certificate Number *</label><input type="text" class="form-control-gov" id="dr-cert" placeholder="DC-2026-000001" /></div>
           <div class="col-md-4"><label class="form-label">Date of Death *</label><input type="date" class="form-control-gov" id="dr-dod" /></div>
           <div class="col-md-4"><label class="form-label">Time of Death</label><input type="time" class="form-control-gov" id="dr-tod" /></div>
-          <div class="col-md-4"><label class="form-label">Place of Death *</label><input type="text" class="form-control-gov" id="dr-place" placeholder="Hospital or address" /></div>
-          <div class="col-md-4">
-            <label class="form-label">Cause Category *</label>
+          <div class="col-md-4"><label class="form-label">Place of Death *</label><input type="text" class="form-control-gov" id="dr-place" /></div>
+          <div class="col-md-4"><label class="form-label">Cause Category *</label>
             <select class="form-control-gov" id="dr-cause-cat">
-              <option value="PENDING">Pending Investigation</option>
-              <option value="NATURAL">Natural Causes</option>
-              <option value="ACCIDENT">Accidental</option>
-              <option value="HOMICIDE">Homicide</option>
-              <option value="SUICIDE">Suicide</option>
-              <option value="UNDETERMINED">Undetermined</option>
-            </select>
-          </div>
-          <div class="col-12"><label class="form-label">Cause of Death (clinical) *</label><textarea class="form-control-gov" id="dr-cause" rows="2" placeholder="e.g. Cardiopulmonary arrest secondary to coronary artery disease"></textarea></div>
+              <option value="PENDING">Pending Investigation</option><option value="NATURAL">Natural Causes</option>
+              <option value="ACCIDENT">Accidental</option><option value="HOMICIDE">Homicide</option>
+              <option value="SUICIDE">Suicide</option><option value="UNDETERMINED">Undetermined</option>
+            </select></div>
+          <div class="col-12"><label class="form-label">Cause of Death (clinical) *</label><textarea class="form-control-gov" id="dr-cause" rows="2"></textarea></div>
           <div class="col-md-4"><label class="form-label">Attending Physician</label><input type="text" class="form-control-gov" id="dr-physician" /></div>
           <div class="col-md-4"><label class="form-label">Coroner Name</label><input type="text" class="form-control-gov" id="dr-coroner" /></div>
           <div class="col-md-4"><label class="form-label">Funeral Home</label><input type="text" class="form-control-gov" id="dr-funeral" /></div>
@@ -125,49 +104,43 @@
 
 <footer class="site-footer">
   <div class="footer-inner">
-    <p>CivicID v1.0 — Death Records Registry</p>
+    <p>CivicID v1.0 &mdash; Death Records Registry</p>
     <img src="/media/civic_id_2026.png" class="footer-seal" alt="" onerror="this.style.display='none'" />
-    <p>Records maintained per vital statistics law — access restricted to authorized personnel</p>
+    <p>Records maintained per vital statistics law &mdash; access restricted to authorized personnel</p>
   </div>
 </footer>
-
 <script>
 let allRecords = [], drPersonId = null, personMap = {};
 const MEDIA_BASE = 'http://127.0.0.1:8000';
 
-// ── Load person map for photo lookup ─────────────────────────────
-// We fetch all persons once so we can look up photo + name by ID
-// when rendering the death records table (death records only store
-// a FK to person, not the full person object).
-apiFetch('/persons/')
-  .then(d => { (Array.isArray(d) ? d : (d.results || [])).forEach(p => { personMap[p.id] = p; }); })
-  .catch(() => {});
+// Pre-load person map so we can show photo + name alongside death records
+apiFetch('/persons/').then(d => { (Array.isArray(d)?d:(d.results||[])).forEach(p=>{ personMap[p.id]=p; }); }).catch(()=>{});
 
-// ── buildPhotoUrl / personPhotoCell ──────────────────────────────
-// Same photo helper pattern used across all updated pages.
 function buildPhotoUrl(path) {
   if (!path) return null;
   if (path.startsWith('http')) return path;
   return `${MEDIA_BASE}/media/${path.replace(/^\//, '')}`;
 }
 
+// personPhotoCell renders a small thumbnail using the cached personMap.
+// No dedicated CSS class needed — inline style matches the registry pattern.
 function personPhotoCell(person) {
-  if (!person) {
-    return `<span style="display:inline-flex;width:32px;height:40px;background:var(--light-gray);
-      border:1px solid var(--mid-gray);border-radius:3px;align-items:center;justify-content:center;
-      color:var(--text-muted);"><i class="bi bi-person"></i></span>`;
-  }
+  const THUMB = 'width:32px;height:40px;border-radius:3px;';
+  const placeholder = `<div style="${THUMB}background:var(--light-gray);border:1px solid var(--mid-gray);display:inline-flex;align-items:center;justify-content:center;color:var(--text-muted);font-size:16px;"><i class="bi bi-person"></i></div>`;
+  if (!person) return placeholder;
   const url = buildPhotoUrl(person.photo);
-  if (!url) {
-    return `<span style="display:inline-flex;width:32px;height:40px;background:var(--light-gray);
-      border:1px solid var(--mid-gray);border-radius:3px;align-items:center;justify-content:center;
-      color:var(--text-muted);" title="${person.first_name} ${person.last_name || ''}">
-      <i class="bi bi-person"></i></span>`;
-  }
-  return `<img src="${url}" alt="${person.first_name} ${person.last_name || ''}"
-    style="width:32px;height:40px;object-fit:cover;border:1px solid var(--cobalt);border-radius:3px;vertical-align:middle;"
-    title="${person.first_name} ${person.last_name || ''}"
-    onerror="this.outerHTML='<span style=\\'display:inline-flex;width:32px;height:40px;background:var(--light-gray);border:1px solid var(--mid-gray);border-radius:3px;align-items:center;justify-content:center;color:var(--text-muted);\\'><i class=\\'bi bi-person\\'></i></span>'" />`;
+  if (!url) return placeholder;
+  const n = (person.first_name + ' ' + (person.last_name || '')).trim();
+  return `<img src="${url}" alt="${n}" title="${n}"
+    style="${THUMB}max-width:32px;max-height:32px;object-fit:cover;border:1px solid var(--cobalt);display:block;"
+    onerror="this.style.display='none';" />`;
+}" alt="${n}" title="${n}"
+      style="width:32px;height:40px;max-width:32px;max-height:40px;object-fit:cover;border:1px solid var(--cobalt);border-radius:3px;display:block;"
+      onerror="this.style.display='none';this.nextElementSibling.style.display='flex';" />
+    <div style="display:none;position:absolute;top:0;left:0;width:32px;height:40px;background:var(--light-gray);border:1px solid var(--mid-gray);border-radius:3px;align-items:center;justify-content:center;color:var(--text-muted);font-size:16px;">
+      <i class="bi bi-person"></i>
+    </div>
+  </span>`;
 }
 
 function drLookup() {
@@ -176,85 +149,78 @@ function drLookup() {
   drPersonId = null;
   if (!pid) return;
   el.textContent = 'Searching…';
-  apiFetch('/persons/' + pid + '/').then(p => {
-    drPersonId = p.id;
-    personMap[p.id] = p; // Cache it
-    el.innerHTML = `<span style="color:var(--success);">✓ ${p.first_name} ${p.last_name || ''} — DOB: ${formatDate(p.date_of_birth)}</span>`;
+  apiFetch('/persons/'+pid+'/').then(p => {
+    drPersonId = p.id; personMap[p.id] = p;
+    el.innerHTML = '<span style="color:var(--success);">✓ '+p.first_name+' '+(p.last_name||'')+' — DOB: '+formatDate(p.date_of_birth)+'</span>';
   }).catch(() => { el.innerHTML = '<span style="color:var(--danger);">Person not found</span>'; });
 }
 
 async function submitDeath() {
   const e = document.getElementById('dr-error'), s = document.getElementById('dr-success');
-  e.style.display = 'none'; s.style.display = 'none';
-  if (!drPersonId) { document.getElementById('dr-error-msg').textContent = 'Look up a valid person first.'; e.style.display = 'flex'; return; }
+  e.style.display='none'; s.style.display='none';
+  if (!drPersonId) { document.getElementById('dr-error-msg').textContent='Look up a valid person first.'; e.style.display='flex'; return; }
   const body = {
     person: drPersonId,
     certificate_number: document.getElementById('dr-cert').value.trim(),
     date_of_death: document.getElementById('dr-dod').value,
-    time_of_death: document.getElementById('dr-tod').value || null,
+    time_of_death: document.getElementById('dr-tod').value||null,
     place_of_death: document.getElementById('dr-place').value.trim(),
     cause_category: document.getElementById('dr-cause-cat').value,
     cause_of_death: document.getElementById('dr-cause').value.trim(),
-    attending_physician: document.getElementById('dr-physician').value.trim() || null,
-    coroner_name: document.getElementById('dr-coroner').value.trim() || null,
-    funeral_home: document.getElementById('dr-funeral').value.trim() || null,
-    notes: document.getElementById('dr-notes').value.trim() || null,
+    attending_physician: document.getElementById('dr-physician').value.trim()||null,
+    coroner_name: document.getElementById('dr-coroner').value.trim()||null,
+    funeral_home: document.getElementById('dr-funeral').value.trim()||null,
+    notes: document.getElementById('dr-notes').value.trim()||null,
   };
-  if (!body.certificate_number || !body.date_of_death || !body.place_of_death || !body.cause_of_death) {
-    document.getElementById('dr-error-msg').textContent = 'All required fields must be filled.';
-    e.style.display = 'flex'; return;
+  if (!body.certificate_number||!body.date_of_death||!body.place_of_death||!body.cause_of_death) {
+    document.getElementById('dr-error-msg').textContent='All required fields must be filled.'; e.style.display='flex'; return;
   }
   try {
-    await apiFetch('/death-records/', { method: 'POST', body: JSON.stringify(body) });
-    s.style.display = 'flex';
-    setTimeout(() => { bootstrap.Modal.getInstance(document.getElementById('newDeathModal')).hide(); loadRecords(); }, 1500);
-  } catch (err) { document.getElementById('dr-error-msg').textContent = 'Failed: ' + err.message; e.style.display = 'flex'; }
+    await apiFetch('/death-records/', { method:'POST', body:JSON.stringify(body) });
+    s.style.display='flex';
+    setTimeout(()=>{ bootstrap.Modal.getInstance(document.getElementById('newDeathModal')).hide(); loadRecords(); }, 1500);
+  } catch(err) { document.getElementById('dr-error-msg').textContent='Failed: '+err.message; e.style.display='flex'; }
 }
 
 function loadRecords() {
   apiFetch('/death-records/').then(d => {
-    allRecords = Array.isArray(d) ? d : (d.results || []);
+    allRecords = Array.isArray(d)?d:(d.results||[]);
     document.getElementById('stat-total').textContent    = allRecords.length;
-    document.getElementById('stat-natural').textContent  = allRecords.filter(r => r.cause_category === 'NATURAL').length;
-    document.getElementById('stat-homicide').textContent = allRecords.filter(r => r.cause_category === 'HOMICIDE').length;
-    document.getElementById('stat-pending').textContent  = allRecords.filter(r => r.cause_category === 'PENDING').length;
+    document.getElementById('stat-natural').textContent  = allRecords.filter(r=>r.cause_category==='NATURAL').length;
+    document.getElementById('stat-homicide').textContent = allRecords.filter(r=>r.cause_category==='HOMICIDE').length;
+    document.getElementById('stat-pending').textContent  = allRecords.filter(r=>r.cause_category==='PENDING').length;
     renderRecords(allRecords);
-  }).catch(() => {
-    document.getElementById('records-tbody').innerHTML =
-      '<tr><td colspan="8" style="text-align:center;padding:32px;color:#8896B0;"><i class="bi bi-wifi-off me-2"></i>Backend offline</td></tr>';
-  });
+  }).catch(() => { document.getElementById('records-tbody').innerHTML='<tr><td colspan="8" style="text-align:center;padding:32px;color:#8896B0;"><i class="bi bi-wifi-off me-2"></i>Backend offline</td></tr>'; });
 }
 
 function renderRecords(items) {
   const t = document.getElementById('records-tbody');
-  if (!items.length) { t.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:32px;color:#8896B0;">No death records found</td></tr>'; return; }
+  if (!items.length) { t.innerHTML='<tr><td colspan="8" style="text-align:center;padding:32px;color:#8896B0;">No death records found</td></tr>'; return; }
   t.innerHTML = items.map(r => {
     const p = personMap[r.person];
-    return `<tr>
-      <td class="mono">${r.certificate_number}</td>
-      <!-- Person photo thumbnail -->
-      <td style="text-align:center;">${personPhotoCell(p)}</td>
-      <td>${p ? `<strong>${p.first_name} ${p.last_name || ''}</strong>` : 'Person #' + String(r.person).padStart(4, '0')}</td>
-      <td>${formatDate(r.date_of_death)}</td>
-      <td style="font-size:12px;">${r.place_of_death || '—'}</td>
-      <td>${statusBadge(r.cause_category)}</td>
-      <td style="font-size:12px;">${r.filed_by ? 'User #' + r.filed_by : '—'}</td>
-      <td style="font-size:12px;">${formatDate(r.created_at)}</td>
-    </tr>`;
+    return '<tr>'
+      +'<td class="mono">'+r.certificate_number+'</td>'
+      +'<td style="text-align:center;">'+personPhotoCell(p)+'</td>'
+      +'<td>'+(p?'<strong>'+p.first_name+' '+(p.last_name||'')+'</strong>':'Person #'+String(r.person).padStart(4,'0'))+'</td>'
+      +'<td>'+formatDate(r.date_of_death)+'</td>'
+      +'<td style="font-size:12px;">'+(r.place_of_death||'—')+'</td>'
+      +'<td>'+statusBadge(r.cause_category)+'</td>'
+      +'<td style="font-size:12px;">'+(r.filed_by?'User #'+r.filed_by:'—')+'</td>'
+      +'<td style="font-size:12px;">'+formatDate(r.created_at)+'</td>'
+      +'</tr>';
   }).join('');
 }
 
 function filterRecords() {
   const q = document.getElementById('search-input').value.toLowerCase();
-  renderRecords(allRecords.filter(r => r.certificate_number.toLowerCase().includes(q)));
+  renderRecords(allRecords.filter(r=>r.certificate_number.toLowerCase().includes(q)));
 }
 
 document.getElementById('newDeathModal').addEventListener('show.bs.modal', () => {
-  document.getElementById('dr-error').style.display = 'none';
-  document.getElementById('dr-success').style.display = 'none';
-  document.getElementById('dr-dod').value = new Date().toISOString().split('T')[0];
-  drPersonId = null;
-  document.getElementById('dr-lookup').textContent = '';
+  document.getElementById('dr-error').style.display='none';
+  document.getElementById('dr-success').style.display='none';
+  document.getElementById('dr-dod').value=new Date().toISOString().split('T')[0];
+  drPersonId=null; document.getElementById('dr-lookup').textContent='';
 });
 
 loadRecords();

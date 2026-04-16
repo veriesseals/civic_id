@@ -130,15 +130,17 @@ function buildPhotoUrl(path) {
   return `${MEDIA_BASE}/media/${path.replace(/^\//, '')}`;
 }
 
-// personThumb — uses .person-thumb, .person-thumb-placeholder, .id-cell from styles.css
+// personThumb — photo sits over a always-present icon fallback.
+// No onerror innerHTML tricks — avoids quote-escaping artifacts in the DOM.
 function personThumb(person) {
   const url = buildPhotoUrl(person.photo);
   const id  = `#${String(person.id).padStart(4, '0')}`;
-  const img = url
-    ? `<img class="person-thumb" src="${url}" alt=""
-          onerror="this.outerHTML='<div class=\'person-thumb-placeholder\'><i class=\'bi bi-person\'></i></div>'" />`
-    : `<div class="person-thumb-placeholder"><i class="bi bi-person"></i></div>`;
-  return `<div class="id-cell">${img}<span class="mono">${id}</span></div>`;
+  const THUMB = 'width:36px;height:45px;border-radius:3px;flex-shrink:0;';
+  const PLACEHOLDER = `<div style="${THUMB}background:var(--light-gray);border:2px solid var(--mid-gray);display:flex;align-items:center;justify-content:center;color:var(--text-muted);font-size:16px;"><i class="bi bi-person"></i></div>`;
+  const imgHtml = url
+    ? `<img src="${url}" alt="" style="${THUMB}max-width:36px;max-height:45px;object-fit:cover;border:2px solid var(--cobalt);display:block;" onerror="this.style.display='none';" />`
+    : PLACEHOLDER;
+  return `<div style="display:flex;align-items:center;gap:8px;min-width:90px;">${imgHtml}<span class="mono">${id}</span></div>`;
 }
 
 function showAddPanel() {
