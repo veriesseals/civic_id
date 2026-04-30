@@ -54,6 +54,8 @@ class SocialSecurityRecord(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    # ──────────────────────────────────────────────────────────────
+    # Methods
     def __str__(self):
         return f"SSN ***-**-{self.ssn[-4:]} — {self.person}"
 
